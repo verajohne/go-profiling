@@ -16,11 +16,7 @@ func main() {
 	r.Use(middleware.Logger)
 
 	r.Get("/data", func(w http.ResponseWriter, r *http.Request) {
-		rdb := redis.NewClient(&redis.Options{
-			Addr:     "localhost:6379",
-			Password: "", // no password set
-			DB:       0,  // use default DB
-		})
+		rdb := NewRedisClient()
 		val, err := rdb.Get(ctx, "jsonData").Result()
 		if err != nil {
 			panic(err)
@@ -30,19 +26,23 @@ func main() {
 	})
 
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
-		rdb := redis.NewClient(&redis.Options{
-			Addr:     "localhost:6379",
-			Password: "", // no password set
-			DB:       0,  // use default DB
-		})
+		rdb := NewRedisClient()
 		resp, _ := http.Get("https://jsonplaceholder.typicode.com/todos/1")
 		body, _ := ioutil.ReadAll(resp.Body)
 		err := rdb.Set(ctx, "jsonData", body, 0).Err()
 		if err != nil {
 			panic(err)
 		}
-
 		w.Write([]byte("Written to Redis"))
 	})
+
 	http.ListenAndServe(":3000", r)
+}
+
+func NewRedisClient() *redis.Client {
+	return redis.NewClient(&redis.Options{
+		Addr:     "localhost:6379",
+		Password: "", // no password set
+		DB:       0,  // use default DB
+	})
 }
