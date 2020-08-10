@@ -52,10 +52,19 @@ func main() {
 // curl localhost:3000/httpclient
 // done
 
+// NewRedisClient creates a new client
 func NewRedisClient() *redis.Client {
 	return redis.NewClient(&redis.Options{
 		Addr:     "localhost:6379",
 		Password: "",
 		DB:       0,
 	})
+}
+
+// Fib is fun
+func Fib(n int) int {
+	if n < 2 {
+		return n
+	}
+	return Fib(n-1) + Fib(n-2)
 }
